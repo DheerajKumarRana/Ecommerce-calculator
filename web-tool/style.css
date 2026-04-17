@@ -22,8 +22,7 @@ body {
     background-color: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
+    display: block;
     overflow-x: hidden;
     line-height: 1.6;
 }
@@ -52,7 +51,7 @@ body {
 
 @keyframes move { from { transform: translate(0, 0); } to { transform: translate(10%, 15%); } }
 
-.container { width: 100%; max-width: 1200px; padding: 1rem 2rem; }
+.container { width: 100%; max-width: 1200px; padding: 1rem 2rem; margin: 0 auto; }
 
 header { text-align: center; margin-bottom: 1.5rem; }
 h1 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
@@ -261,8 +260,37 @@ select option {
     .grid { grid-template-columns: 1fr; }
     h1 { font-size: 2.2rem; }
     .container { padding: 1rem; }
-    .brand-badge { position: static; display: inline-block; margin-bottom: 2rem; }
-    .card.scrollable { max-height: none; }
+    .brand-badge { display: none; }
+    .card.scrollable { max-height: none; overflow: visible; }
+    .results-column { width: 100%; }
+    .result-card.highlight { min-height: auto; }
+}
+
+@media (max-width: 700px) {
+    .container { padding: 0.75rem; }
+    h1 { font-size: 1.95rem; }
+    header p { font-size: 1.05rem; line-height: 1.45; }
+
+    .card { padding: 1rem; }
+    .card-header { align-items: flex-start; flex-direction: column; gap: 0.5rem; }
+    .card-header h2 { font-size: 2rem; }
+
+    .section-box { padding: 0.85rem; margin-bottom: 0.65rem; }
+    .section-box h3 { font-size: 0.75rem; line-height: 1.4; }
+
+    .dual-input { display: grid; grid-template-columns: 1fr; gap: 0.45rem; }
+    .toggle-group { width: 100%; }
+    .toggle-group button { flex: 1; }
+
+    input, select { font-size: 1rem; }
+    .strategy-toggle { flex-direction: column; gap: 0.5rem; }
+
+    .dashboard-stats { grid-template-columns: 1fr; }
+    .table-header, .table-row { grid-template-columns: 1.45fr 0.85fr 1fr; padding: 0.55rem 0.4rem; }
+    .table-row span { font-size: 0.8rem; }
+
+    .price-display { font-size: 2.4rem; }
+    .btn-small { width: 100%; text-align: center; }
 }
 
 @media print {
