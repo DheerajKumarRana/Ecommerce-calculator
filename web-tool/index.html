@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce Pricing Calculator | Premium Shopify Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="brand-badge">A Product of Nexadvent</div>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="container">
+        <header>
+            <h1>Ecommerce Strategy <span class="accent">Calculator</span></h1>
+            <p>Optimize your Shopify pricing for max profitability (Shiprocket Integrated)</p>
+        </header>
+
+        <section class="grid">
+            <!-- Left: Inputs -->
+            <div class="card glass">
+                <div class="card-header">
+                    <h2>Configuration</h2>
+                    <span class="badge">Live Calculation</span>
+                </div>
+                
+                <div class="input-group">
+                    <label for="cost-price">Product Cost Price (₹)</label>
+                    <input type="number" id="cost-price" placeholder="499" value="500">
+                </div>
+
+                <div class="input-group">
+                    <label for="weight">Product Weight (grams)</label>
+                    <input type="number" id="weight" placeholder="500" value="500">
+                    <small>Shiprocket slabs: 500g increments</small>
+                </div>
+
+                <div class="input-group">
+                    <label for="profit-margin">Target Profit Margin (%)</label>
+                    <div class="range-container">
+                        <input type="range" id="profit-margin-slider" min="0" max="100" value="25">
+                        <input type="number" id="profit-margin" value="25">
+                    </div>
+                </div>
+
+                <div class="advanced-settings">
+                    <h3>Advanced Settings</h3>
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label for="product-gst">Product GST (%)</label>
+                            <select id="product-gst">
+                                <option value="0">0%</option>
+                                <option value="5">5%</option>
+                                <option value="12" selected>12%</option>
+                                <option value="18">18%</option>
+                                <option value="28">28%</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="shopify-fee">Shopify Fee (%)</label>
+                            <input type="number" id="shopify-fee" value="2" step="0.1">
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label for="gateway-fee">Gateway Fee (%)</label>
+                            <input type="number" id="gateway-fee" value="2" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="packaging">Packaging (₹)</label>
+                            <input type="number" id="packaging" value="15">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Results -->
+            <div class="results-column">
+                <div class="card result-card glass highlight">
+                    <p class="label">Recommended Selling Price (Inclusive)</p>
+                    <div class="price-display">
+                        <span class="currency">₹</span>
+                        <span id="final-price">0</span>
+                    </div>
+                </div>
+
+                <div class="card glass breakdown-card">
+                    <div class="card-header">
+                        <h2>Breakdown</h2>
+                        <div class="button-group">
+                            <button id="export-btn" class="btn-small">Print Strategy Report</button>
+                        </div>
+                    </div>
+                    <div class="breakdown-table">
+                        <div class="table-header">
+                            <span>Component</span>
+                            <span>Value</span>
+                        </div>
+                        <div class="table-row">
+                            <span>Cost Price</span>
+                            <span id="res-cp">₹0</span>
+                        </div>
+                        <div class="table-row">
+                            <span>Shipping (Shiprocket)</span>
+                            <span id="res-shipping">₹0</span>
+                        </div>
+                        <div class="table-row">
+                            <span>Total Platform Fees</span>
+                            <span id="res-fees">₹0</span>
+                        </div>
+                        <div class="table-row">
+                            <span>GST Liability</span>
+                            <span id="res-gst">₹0</span>
+                        </div>
+                        <div class="table-row row-profit">
+                            <span>Net Profit</span>
+                            <span id="res-profit">₹0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2024 Ecommerce Calculator Tool • Data based on Shiprocket Indian Service Rates</p>
+        </footer>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
