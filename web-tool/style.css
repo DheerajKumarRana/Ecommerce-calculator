@@ -105,6 +105,7 @@ header p {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
+    align-items: stretch;
 }
 
 .glass {
@@ -166,6 +167,14 @@ input, select {
     transition: all 0.2s;
     appearance: none;
     -webkit-appearance: none;
+    -moz-appearance: textfield;
+}
+
+/* Hide number spinners */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 select {
@@ -177,7 +186,7 @@ select {
 }
 
 select option {
-    background-color: var(--bg);
+    background-color: #1e293b; /* Solid dark color to prevent white boxes */
     color: white;
 }
 
@@ -191,6 +200,43 @@ input:focus, select:focus {
     display: flex;
     gap: 1rem;
     align-items: center;
+}
+
+.range-container input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    padding: 0;
+}
+
+.range-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary);
+    box-shadow: 0 0 10px var(--primary);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.range-container input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background: white;
+}
+
+.range-container input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--primary);
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
 }
 
 .range-container input[type="number"] {
@@ -220,6 +266,11 @@ h3 {
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    height: 100%;
+}
+
+.results-column .card:last-child {
+    flex-grow: 1;
 }
 
 .result-card.highlight {
@@ -396,6 +447,17 @@ footer {
         grid-template-columns: 1fr;
     }
     h1 {
-        font-size: 2rem;
+        font-size: 2.2rem;
+    }
+    .container {
+        padding: 1rem;
+    }
+    .brand-badge {
+        position: static;
+        display: inline-block;
+        margin-bottom: 2rem;
+    }
+    .result-card .price-display {
+        font-size: 3.5rem;
     }
 }
