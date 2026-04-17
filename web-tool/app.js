@@ -1,116 +1,155 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Inputs
-    const costPriceInput = document.getElementById('cost-price');
-    const weightInput = document.getElementById('weight');
-    const profitMarginInput = document.getElementById('profit-margin');
-    const profitMarginSlider = document.getElementById('profit-margin-slider');
-    const productGstInput = document.getElementById('product-gst');
-    const shopifyFeeInput = document.getElementById('shopify-fee');
-    const gatewayFeeInput = document.getElementById('gateway-fee');
-    const packagingInput = document.getElementById('packaging');
+    // Dynamic Inputs Registry
+    const inputs = [
+        'raw-material', 'production', 'packaging', 
+        'shipping', 'rto-cost', 'cac', 'other-costs', 
+        'profit-goal'
+    ];
 
-    // Outputs
+    // Persist Mode (fixed vs percent)
+    let currentStrategy = 'inclusive'; // inclusive or exclusive
+    
+    const modes = {
+        'raw-material': 'fixed',
+        'production': 'fixed',
+        'packaging': 'fixed',
+        'shipping': 'fixed',
+        'rto-cost': 'percent',
+        'cac': 'fixed',
+        'other-costs': 'fixed',
+        'profit-goal': 'percent'
+    };
+
+    // Constant % Inputs
+    const gatewayFeeInput = document.getElementById('gateway-fee');
+    const productGstInput = document.getElementById('product-gst');
+
+    // Display Elements
     const finalPriceDisplay = document.getElementById('final-price');
-    const resCp = document.getElementById('res-cp');
-    const resShipping = document.getElementById('res-shipping');
-    const resFees = document.getElementById('res-fees');
-    const resGst = document.getElementById('res-gst');
+    const resNetSales = document.getElementById('res-net-sales');
+    const resCogs = document.getElementById('res-cogs');
     const resProfit = document.getElementById('res-profit');
 
-    const exportBtn = document.getElementById('export-btn');
-
-    function calculateShipping(weightGrams) {
-        if (!weightGrams || weightGrams <= 0) return 0;
-        
-        // Shiprocket Average Rates (Approx)
-        // First 500g: ₹55
-        // Every additional 500g: +₹45
-        const firstSlabLimit = 500;
-        const firstSlabRate = 55;
-        const addSlabRate = 45;
-
-        let rate = firstSlabRate;
-        if (weightGrams > firstSlabLimit) {
-            const extraWeight = weightGrams - firstSlabLimit;
-            const extraSlabs = Math.ceil(extraWeight / 500);
-            rate += extraSlabs * addSlabRate;
-        }
-
-        // Add 18% GST on shipping
-        return rate * 1.18;
-    }
+    const shareCogs = document.getElementById('share-cogs');
+    const valCogs = document.getElementById('val-cogs');
+    const shareShipping = document.getElementById('share-shipping');
+    const valShipping = document.getElementById('val-shipping');
+    const shareCac = document.getElementById('share-cac');
+    const valCac = document.getElementById('val-cac');
+    const shareTax = document.getElementById('share-tax');
+    const valTax = document.getElementById('val-tax');
+    const shareProfit = document.getElementById('share-profit');
 
     function calculate() {
-        const CP = parseFloat(costPriceInput.value) || 0;
-        const W = parseFloat(weightInput.value) || 0;
-        const M = (parseFloat(profitMarginInput.value) || 0) / 100;
-        const G = (parseFloat(productGstInput.value) || 0) / 100;
-        const shopifyRate = (parseFloat(shopifyFeeInput.value) || 0) / 100;
+        let fixedSum = 0;
+        let percentSum = 0;
+        
+        // 1. Summarize all inputs based on their mode
+        inputs.forEach(id => {
+            const val = parseFloat(document.getElementById(id).value) || 0;
+            if (modes[id] === 'fixed') {
+                fixedSum += val;
+            } else {
+                percentSum += (val / 100);
+            }
+        });
+
+        // 2. Add Constant % Fees
         const gatewayRate = (parseFloat(gatewayFeeInput.value) || 0) / 100;
-        const packaging = parseFloat(packagingInput.value) || 0;
+        const gatewayWithGst = gatewayRate * 1.18; // Gateway + 18% GST on that fee
+        percentSum += gatewayWithGst;
 
-        const shipping = calculateShipping(W);
-        const CTC = CP + shipping + packaging;
-
-        // Fees Leakage (Platform + Gateway + 18% GST on these fees)
-        const feeFactor = (shopifyRate + gatewayRate) * 1.18;
-
-        // GST Liability Factor (Inclusive)
-        // If Price is SP, GST part is SP * (G / (1+G))
-        const gstFactor = G / (1 + G);
-
-        // Denominator: 1 - Margin - FeesFactor - GstFactor
-        const denominator = 1 - M - feeFactor - gstFactor;
-
+        // 3. GST Strategy Branching
+        const gstRate = (parseFloat(productGstInput.value) || 0) / 100;
         let SP = 0;
-        if (denominator > 0) {
-            SP = CTC / denominator;
+        let valGstLiability = 0;
+
+        if (currentStrategy === 'inclusive') {
+            const gstFactor = gstRate / (1 + gstRate);
+            const denominator = 1 - percentSum - gstFactor;
+            if (denominator > 0) {
+                SP = fixedSum / denominator;
+            }
+            valGstLiability = SP * gstFactor;
         } else {
-            // Handle edge case where margin + fees + taxes > 100%
-            SP = 0;
+            const denominator = 1 - percentSum;
+            if (denominator > 0) {
+                const spBase = fixedSum / denominator;
+                SP = spBase * (1 + gstRate);
+                valGstLiability = SP - spBase;
+            }
         }
 
-        // Breakdown values for display
-        const totalFees = SP * feeFactor;
-        const gstLiability = SP * gstFactor;
-        const netProfit = SP * M;
+        // 4. Calculate Absolute Shares for Breakdown
+        const getVal = (id) => {
+            const v = parseFloat(document.getElementById(id).value) || 0;
+            return modes[id] === 'fixed' ? v : SP * (v / 100);
+        };
 
-        // Update UI
+        const valRM = getVal('raw-material');
+        const valProd = getVal('production');
+        const valPack = getVal('packaging');
+        const valCOGS = valRM + valProd + valPack;
+
+        const valShip = getVal('shipping');
+        const valRTO = getVal('rto-cost');
+        const valLogistics = valShip + valRTO;
+
+        const valCAC = getVal('cac');
+        const valOther = getVal('other-costs');
+        
+        const valGateway = SP * gatewayWithGst;
+        const valTotalTaxFees = valGateway + valGstLiability;
+
+        // 5. Update UI
         finalPriceDisplay.textContent = Math.round(SP).toLocaleString('en-IN');
-        resCp.textContent = `₹${CP.toLocaleString('en-IN')}`;
-        resShipping.textContent = `₹${Math.round(shipping).toLocaleString('en-IN')}`;
-        resFees.textContent = `₹${Math.round(totalFees).toLocaleString('en-IN')}`;
-        resGst.textContent = `₹${Math.round(gstLiability).toLocaleString('en-IN')}`;
-        resProfit.textContent = `₹${Math.round(netProfit).toLocaleString('en-IN')}`;
+        resNetSales.textContent = `₹${Math.round(SP - valGstLiability).toLocaleString('en-IN')}`;
+        resCogs.textContent = `₹${Math.round(valCOGS).toLocaleString('en-IN')}`;
+        resProfit.textContent = `₹${Math.round(valCOGS > 0 ? (SP - valGstLiability - valCOGS - valLogistics - valCAC - valOther - valGateway) : 0).toLocaleString('en-IN')}`;
 
-        // Glow effect if profitable
-        if (netProfit > 0) {
-            finalPriceDisplay.parentElement.style.color = 'white';
-        } else {
-            finalPriceDisplay.parentElement.style.color = '#f87171';
-        }
+        valCogs.textContent = `₹${Math.round(valCOGS).toLocaleString('en-IN')}`;
+        shareCogs.textContent = `${Math.round((valCOGS / SP) * 100 || 0)}%`;
+
+        valShipping.textContent = `₹${Math.round(valLogistics).toLocaleString('en-IN')}`;
+        shareShipping.textContent = `${Math.round((valLogistics / SP) * 100 || 0)}%`;
+
+        valCac.textContent = `₹${Math.round(valCAC).toLocaleString('en-IN')}`;
+        shareCac.textContent = `${Math.round((valCAC / SP) * 100 || 0)}%`;
+
+        valTax.textContent = `₹${Math.round(valTotalTaxFees).toLocaleString('en-IN')}`;
+        shareTax.textContent = `${Math.round((valTotalTaxFees / SP) * 100 || 0)}%`;
+
+        shareProfit.textContent = `${Math.round(((SP - valGstLiability - valCOGS - valLogistics - valCAC - valOther - valGateway) / SP) * 100 || 0)}%`;
     }
 
-    // Sync Slider and Input
-    profitMarginSlider.addEventListener('input', (e) => {
-        profitMarginInput.value = e.target.value;
-        calculate();
+    // Event Listeners
+    document.querySelectorAll('#gst-strategy button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            currentStrategy = e.currentTarget.getAttribute('data-strategy');
+            document.querySelectorAll('#gst-strategy button').forEach(b => b.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            calculate();
+        });
     });
 
-    profitMarginInput.addEventListener('input', (e) => {
-        profitMarginSlider.value = e.target.value;
-        calculate();
+    document.querySelectorAll('.toggle-group button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const group = e.target.parentElement;
+            const inputId = group.getAttribute('data-for');
+            modes[inputId] = e.target.getAttribute('data-type');
+            group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            calculate();
+        });
     });
 
-    // Event Listeners for all inputs
-    [costPriceInput, weightInput, productGstInput, shopifyFeeInput, gatewayFeeInput, packagingInput].forEach(el => {
-        el.addEventListener('input', calculate);
+    // Input Listeners
+    [...inputs, 'gateway-fee', 'product-gst'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calculate);
     });
 
-    exportBtn.addEventListener('click', () => {
-        window.print();
-    });
+    document.getElementById('export-btn').addEventListener('click', () => window.print());
 
-    // Initial Calculation
+    // Initial Run
     calculate();
 });
