@@ -63,7 +63,7 @@ header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem; }
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
-    align-items: stretch;
+    align-items: start;
 }
 
 .glass {
@@ -75,7 +75,7 @@ header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem; }
     box-shadow: var(--glass-shadow);
 }
 
-.card { padding: 1.25rem; height: 100%; }
+.card { padding: 1.25rem; }
 
 .section-box {
     background: rgba(255, 255, 255, 0.02);
@@ -117,6 +117,32 @@ input, select {
     width: 100%;
     appearance: none;
     -moz-appearance: textfield;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    margin: 0;
+}
+
+select {
+    padding-right: 2.2rem;
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--text-muted) 50%),
+        linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+    background-position:
+        calc(100% - 16px) calc(50% - 3px),
+        calc(100% - 10px) calc(50% - 3px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+}
+
+select option {
+    background: #1e1b4b;
+    color: #f8fafc;
 }
 
 .strategy-toggle {
@@ -186,8 +212,8 @@ input, select {
 }
 
 /* Results section */
-.results-column { display: flex; flex-direction: column; gap: 2rem; height: 100%; }
-.result-card.highlight { background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(236, 72, 153, 0.08)); border-color: rgba(99, 102, 241, 0.2); text-align: center; padding: 1rem !important; }
+.results-column { display: flex; flex-direction: column; gap: 1.2rem; align-self: start; }
+.result-card.highlight { background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(236, 72, 153, 0.08)); border-color: rgba(99, 102, 241, 0.2); text-align: center; padding: 1rem !important; min-height: auto; }
 .price-display { font-size: 2.8rem; font-weight: 700; color: white; margin-top: 0.2rem; }
 .currency { font-size: 1.4rem; vertical-align: super; color: var(--primary); }
 
